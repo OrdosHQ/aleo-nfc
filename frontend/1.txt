@@ -1,0 +1,20 @@
+1) Twitter OAUTH
+2) Scan nfc chip -> when data received make transaction 
+
+Record type: url MIME type: null === data === https://iyk.app/t/c/v1?
+e=B3962FBB2A83BAF0C90AB287D734C403
+
+struct ChipData {
+    finger_print: u128, => B3962FBB2A83BAF0C90AB287D734C403 = to number u128
+    id: u128,
+    type: u128,
+}
+
+
+transition register(chip_data: ChipData, owner: address) -> Chip {}
+
+3) After transaction success fetch record end decrypt it
+
+4) Show list of added nfts
+    a) User can transfer by scanning qr code (consist of addres)
+    b) User can public his nft (announce_ownership)
