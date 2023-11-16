@@ -1,14 +1,20 @@
-version: "3.4"
-services:
-    vite_docker:
-        image: node:alpine
-        container_name: vite_docker
-        entrypoint: /bin/sh
-        ports:
-            - 3000:3000
-        working_dir: /srv/app
-        volumes:
-            - type: bind
-            source: ./
-            target: /srv/app
-        tty: true
+# Установка базового образа
+FROM node:latest
+
+# Установка рабочей директории в контейнере
+WORKDIR /app
+
+# Копирование файлов package.json и package-lock.json
+COPY package*.json ./
+
+# Установка зависимостей проекта
+RUN npm install
+
+# Копирование исходного кода проекта в контейнер
+COPY . .
+
+# Открытие порта 3000
+EXPOSE 3000
+
+# Определение команды для запуска приложения
+CMD ["npm", "start"]
