@@ -1,0 +1,9 @@
+
+<- это один раз на машине ->
+doctl auth switch --context mov3r
+doctl registry login
+
+<- это что бы залить ->
+docker build -t aleo-nfc-front .
+docker tag aleo-nfc-front registry.digitalocean.com/mov3r-container/aleo-nfc-front
+docker push registry.digitalocean.com/mov3r-container/aleo-nfc-front

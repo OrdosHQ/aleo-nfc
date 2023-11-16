@@ -1,20 +1,15 @@
-# Установка базового образа
-FROM node:latest
+FROM --platform=linux/amd64 node:20
 
-# Установка рабочей директории в контейнере
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Копирование файлов package.json и package-lock.json
-COPY package*.json ./
+COPY package.json ./
+COPY package-lock.json ./
+COPY scripts/. ./scripts
 
-# Установка зависимостей проекта
-RUN npm install
+RUN npm i
 
-# Копирование исходного кода проекта в контейнер
 COPY . .
 
-# Открытие порта 3000
-EXPOSE 3000
+RUN chmod +x ./scripts/*.sh
 
-# Определение команды для запуска приложения
-CMD ["npm", "start"]
+ENTRYPOINT [ "./scripts/prod.sh" ]
