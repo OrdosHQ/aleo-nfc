@@ -1,0 +1,33 @@
+{
+  "name": "aleo-nfc-back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "npm i && tsc && node ./dist/main.js",
+    "build": "tsc",
+    "start:dev": "npx ts-node ./src/main.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@superfaceai/passport-twitter-oauth2": "^1.2.3",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "passport": "^0.6.0",
+    "passport-twitter": "^1.0.4",
+    "typeorm": "^0.3.17"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/express-session": "^1.17.10",
+    "@types/node": "^20.9.0",
+    "@types/passport": "^1.0.15",
+    "@types/passport-twitter": "^1.0.40",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
