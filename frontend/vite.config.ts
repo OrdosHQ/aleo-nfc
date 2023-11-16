@@ -9,15 +9,17 @@ import svgr from 'vite-plugin-svgr';
 export default defineConfig({
     plugins: [
         react(),
-        viteTsconfigPaths(),
-        svgr({
-            include: '**/*.svg?react',
-        }),
         wasm(),
         topLevelAwait(),
     ],
     optimizeDeps: {
         exclude: ['@aleohq/wasm', '@aleohq/sdk'],
     },
-    server: {},
+    server: {
+        host: true,
+        port: 3000,
+        watch: {
+            usePolling: true
+        }
+    },
 });

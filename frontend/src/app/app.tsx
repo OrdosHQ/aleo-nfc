@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { NextUIProvider } from '@nextui-org/react';
 import { Auth, Home, Mint, Scan } from '../pages';
 import { Navbar } from '../widgets';
