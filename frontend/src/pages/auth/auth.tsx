@@ -15,6 +15,7 @@ export const Auth: FC = () => {
             username: params.get('username'),
             displayName: params.get('displayName'),
             photoUrl: params.get('photoUrl'),
+            token: params.get('token')
         };
 
         addUser(payload);

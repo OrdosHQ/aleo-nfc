@@ -7,9 +7,10 @@ import {
     NetworkRecordProvider,
     ProgramManager,
     AleoKeyProvider,
-    TransactionModel,
+    initThreadPool,
 } from '@aleohq/sdk';
 import axios from 'axios';
+import { workerClient } from '../app/providers/workerClient';
 
 const getField = async (id: string) => {
     return await axios
@@ -29,8 +30,38 @@ const getField = async (id: string) => {
         .then((response) => response.data);
 };
 
+const addRecord = async (txId: string, token: string) => {
+    return await axios.post(`https://aleo-nfc-back-g6lgu.ondigitalocean.app/user/record`, { id: txId}, {
+        headers: {
+            Authorization: token
+        }
+    })
+}
+
+const waitForTx = async (txId: string) => {
+    const { tx, interval } = await new Promise<{ tx: any, interval: NodeJS.Timer, }>(resolve => {
+        const interval = setInterval(async () => {
+            try {
+                const client = new AleoNetworkClient("https://api.explorer.aleo.org/v1")
+
+                const tx = await client.getTransaction(txId).then(response => response).catch(() => null)
+
+                if (tx) {
+                    resolve({ tx, interval })
+                }
+            } catch {
+
+            }
+        }, 5000)
+    })
+
+    clearInterval(interval)
+
+    return tx;
+}
+
 interface IMintFeatureStore {
-    mint: () => Promise<TransactionModel | Error | string | void>;
+    mint: () => Promise<any | Error | string | void>;
     nfcData: any;
     setNfcData: (payload: any) => void;
 }
@@ -41,53 +72,15 @@ export const useMintFeatureStore = create<IMintFeatureStore>((set, get) => ({
     mint: async () => {
         try {
             const { nfcData } = get();
-            const id = nfcData.id;
-            const field = await getField(id);
-            const { aleo, addNfcItem } = useUserStore.getState();
+            const { aleo, addNfcItem, twitter } = useUserStore.getState();
 
-            const account = new Account({
-                privateKey: aleo?.privateKey,
-            });
-            const keyProvider = new AleoKeyProvider();
-            keyProvider.useCache(true);
-
-            const networkClient = new AleoNetworkClient(
-                'https://api.explorer.aleo.org/v1',
-            );
-
-            networkClient.setAccount(account);
-
-            const recordProvider = new NetworkRecordProvider(
-                account,
-                networkClient,
-            );
-
-            const programName = 'aleo_nfc_chip_v2.aleo';
-
-            const programManager = new ProgramManager(
-                'https://api.explorer.aleo.org/v1',
-                keyProvider,
-                recordProvider,
-            );
-
-            programManager.setAccount(account);
-
-            const transactionId = await programManager.execute(
-                programName,
-                'register',
-                5,
-                false,
-                [
-                    `{finger_print: ${id}u128, id: ${id}u128, kind: 1u128}`,
-                    aleo?.address as string,
-                ],
-            );
-
-            if (transactionId) {
-                addNfcItem(nfcData);
-            }
-
-            return transactionId;
+            const { data: transactionId } = await workerClient.mint({ nfcData, aleo })
+            console.log(transactionId, 'worker mint')
+            const tx = await waitForTx(transactionId)
+            console.log(tx, 'tx')
+            const record = await addRecord(tx, twitter.token)
+            console.log(record, 'add record')
+            addNfcItem(record)
         } catch (err) {
             console.log(err as any);
         } finally {

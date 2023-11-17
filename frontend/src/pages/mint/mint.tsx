@@ -6,26 +6,29 @@ import {
     Image,
     Spacer,
 } from '@nextui-org/react';
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useMintFeatureStore } from '../../features/mint';
 import { Navigate, useNavigate } from 'react-router';
+import { useUserStore } from '../../entities/user';
 
 export const Mint: FC = () => {
     const { mint, nfcData } = useMintFeatureStore();
+    const { aleo } = useUserStore()
     const [loading, setLoading] = useState(false);
+    const [worker, setWorker] = useState<any>(null)
     const navigate = useNavigate();
 
     const submitClickHandler = useCallback(async () => {
         try {
             setLoading(true);
 
-            await mint();
+            await mint()
         } finally {
             setLoading(false);
 
             navigate('/');
         }
-    }, [mint]);
+    }, [mint, worker, aleo, nfcData]);
 
     return (
         <div>

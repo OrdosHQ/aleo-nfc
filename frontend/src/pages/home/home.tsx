@@ -1,10 +1,19 @@
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { useUserStore } from '../../entities/user';
 import { Button, Card, CardFooter, Image, Spacer } from '@nextui-org/react';
 import { useNavigate } from 'react-router';
+import { useRecordsFeatureStore } from '../../features/records';
 
 export const Home: FC = () => {
-    const { nfcItems } = useUserStore();
+    const { nfcItems, twitter } = useUserStore();
+
+    const { fetchRecords } = useRecordsFeatureStore()
+
+    useEffect(() => {
+        if (twitter?.token) {
+            fetchRecords()
+        }
+    }, [twitter])
 
     const navigate = useNavigate();
 

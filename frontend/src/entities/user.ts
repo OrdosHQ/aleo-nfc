@@ -8,6 +8,7 @@ interface IUserStore {
     nfcItems: any[];
     setAccount: (payload: { aleo: AleoStruct; twitter: any }) => void;
     addNfcItem: (payload: any) => void;
+    setNfcItems: (payload: any) => void;
 }
 
 export const useUserStore = create<IUserStore>()(
@@ -29,6 +30,10 @@ export const useUserStore = create<IUserStore>()(
                 addNfcItem: (payload) =>
                     set((state) => ({
                         nfcItems: [...state.nfcItems, payload],
+                    })),
+                setNfcItems: (payload) =>
+                    set(() => ({
+                        nfcItems: payload,
                     })),
             }),
             {
