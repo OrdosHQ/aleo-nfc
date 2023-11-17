@@ -25,15 +25,17 @@ const getField = async (id: string) => {
 };
 
 const addRecord = async (txId: string, token: string) => {
-    return await axios.post(
-        `https://aleo-nfc-back-g6lgu.ondigitalocean.app/user/record`,
-        { id: txId },
-        {
-            headers: {
-                Authorization: token,
+    return await axios
+        .post(
+            `https://aleo-nfc-back-g6lgu.ondigitalocean.app/user/record`,
+            { id: txId },
+            {
+                headers: {
+                    Authorization: token,
+                },
             },
-        },
-    ).then(res => res.data);
+        )
+        .then((res) => res.data);
 };
 
 interface IMintFeatureStore {
@@ -50,15 +52,17 @@ export const useMintFeatureStore = create<IMintFeatureStore>((set, get) => ({
             const { nfcData } = get();
             const { aleo, addNfcItem, twitter } = useUserStore.getState();
 
-            const { i } = await new Promise<{ i: NodeJS.Timeout }>((resolve) => {
-                const i = setInterval(() => {
-                    if (useUserStore.getState().isFauceted) {
-                        resolve({ i })
-                    }
-                }, 1000)
-            })
+            const { i } = await new Promise<{ i: NodeJS.Timeout }>(
+                (resolve) => {
+                    const i = setInterval(() => {
+                        if (useUserStore.getState().isFauceted) {
+                            resolve({ i });
+                        }
+                    }, 1000);
+                },
+            );
 
-            clearInterval(i)
+            clearInterval(i);
 
             const { data: transactionId } = await workerClient.mint({
                 nfcData,
@@ -78,7 +82,7 @@ export const useMintFeatureStore = create<IMintFeatureStore>((set, get) => ({
                 kind: getObjectValueByKey('kind', rec),
                 fingerPrint: getObjectValueByKey('finger_print', rec),
                 contract: 'aleo_nfc_chip_v2.aleo',
-                name: 'Aleo Ball Cap #258',
+                name: 'Aleo Ball Cap',
                 image: 'https://doxxy.io/media/cache/ce/6c/ce6c988ac831107924d04610c8cf0678.jpg',
             });
         } catch (err) {

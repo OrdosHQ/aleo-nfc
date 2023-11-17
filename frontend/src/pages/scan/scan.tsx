@@ -8,17 +8,6 @@ export const Scan: FC = () => {
     const navigate = useNavigate();
 
     const scanNFC = async () => {
-        if (!nfcData) {
-            setNfcData({
-                id: 1242353452,
-                contract: 'aleo_nfc_chip_v2.aleo',
-                name: 'Aleo Ball Cap #258',
-                image: 'https://doxxy.io/media/cache/ce/6c/ce6c988ac831107924d04610c8cf0678.jpg',
-            });
-        }
-        // alert(JSON.stringify({ serialNumber, id, nfcData, 'test': 'test' }))
-        navigate('/mint');
-        
         if ('NDEFReader' in window) {
             const ndef = new (window as any).NDEFReader();
 
@@ -33,7 +22,7 @@ export const Scan: FC = () => {
                     setNfcData({
                         id,
                         contract: 'aleo_nfc_chip_v2.aleo',
-                        name: 'Aleo Ball Cap #258',
+                        name: 'Aleo Ball Cap',
                         image: 'https://doxxy.io/media/cache/ce/6c/ce6c988ac831107924d04610c8cf0678.jpg',
                     });
                 }

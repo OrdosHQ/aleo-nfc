@@ -41,7 +41,7 @@ export const useRecordsFeatureStore = create<IMintFeatureStore>((set, get) => ({
                     kind: getObjectValueByKey('kind', rec),
                     fingerPrint: getObjectValueByKey('finger_print', rec),
                     contract: 'aleo_nfc_chip_v2.aleo',
-                    name: 'Aleo Ball Cap #258',
+                    name: 'Aleo Ball Cap',
                     image: 'https://doxxy.io/media/cache/ce/6c/ce6c988ac831107924d04610c8cf0678.jpg',
                 };
             });
