@@ -4,7 +4,6 @@ import { Auth, Home, Mint, Scan } from '../pages';
 import { Navbar } from '../widgets';
 import { Routes, Route } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
-import { initThreadPool } from '@aleohq/sdk';
 
 import './app.css';
 

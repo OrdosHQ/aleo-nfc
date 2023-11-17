@@ -9,9 +9,9 @@ const root = createRoot(
 );
 
 root.render(
-    <StrictMode>
+    // <StrictMode>
         <App />
-    </StrictMode>,
+    // </StrictMode>,
 );
 
 const reportWebVitals = (onPerfEntry?: any) => {

@@ -6,9 +6,11 @@ interface IUserStore {
     aleo: AleoStruct | null;
     twitter: any | null;
     nfcItems: any[];
+    isFauceted: boolean;
     setAccount: (payload: { aleo: AleoStruct; twitter: any }) => void;
     addNfcItem: (payload: any) => void;
     setNfcItems: (payload: any) => void;
+    fauceted: () => void;
 }
 
 export const useUserStore = create<IUserStore>()(
@@ -17,14 +19,8 @@ export const useUserStore = create<IUserStore>()(
             (set) => ({
                 aleo: null,
                 twitter: null,
-                nfcItems: [
-                    {
-                        id: '1264513175327376',
-                        contract: 'aleo_nfc_chip_v2.aleo',
-                        name: 'Aleo Ball Cap #258',
-                        image: 'https://doxxy.io/media/cache/ce/6c/ce6c988ac831107924d04610c8cf0678.jpg',
-                    },
-                ],
+                nfcItems: [],
+                isFauceted: false,
                 setAccount: (payload) =>
                     set({ aleo: payload.aleo, twitter: payload.twitter }),
                 addNfcItem: (payload) =>
@@ -35,6 +31,7 @@ export const useUserStore = create<IUserStore>()(
                     set(() => ({
                         nfcItems: payload,
                     })),
+                fauceted: () => set({ isFauceted: true })
             }),
             {
                 name: 'user',

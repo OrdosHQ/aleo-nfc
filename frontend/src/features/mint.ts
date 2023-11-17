@@ -1,16 +1,10 @@
 import { create } from 'zustand';
-import { AleoStruct } from '../shared/types';
 import { useUserStore } from '../entities/user';
-import {
-    Account,
-    AleoNetworkClient,
-    NetworkRecordProvider,
-    ProgramManager,
-    AleoKeyProvider,
-    initThreadPool,
-} from '@aleohq/sdk';
 import axios from 'axios';
 import { workerClient } from '../app/providers/workerClient';
+import { waitForTx } from '../shared/api/waitForTx';
+import { Account } from '@aleohq/sdk';
+import { getObjectValueByKey } from './records';
 
 const getField = async (id: string) => {
     return await axios
@@ -31,34 +25,16 @@ const getField = async (id: string) => {
 };
 
 const addRecord = async (txId: string, token: string) => {
-    return await axios.post(`https://aleo-nfc-back-g6lgu.ondigitalocean.app/user/record`, { id: txId}, {
-        headers: {
-            Authorization: token
-        }
-    })
-}
-
-const waitForTx = async (txId: string) => {
-    const { tx, interval } = await new Promise<{ tx: any, interval: NodeJS.Timer, }>(resolve => {
-        const interval = setInterval(async () => {
-            try {
-                const client = new AleoNetworkClient("https://api.explorer.aleo.org/v1")
-
-                const tx = await client.getTransaction(txId).then(response => response).catch(() => null)
-
-                if (tx) {
-                    resolve({ tx, interval })
-                }
-            } catch {
-
-            }
-        }, 5000)
-    })
-
-    clearInterval(interval)
-
-    return tx;
-}
+    return await axios.post(
+        `https://aleo-nfc-back-g6lgu.ondigitalocean.app/user/record`,
+        { id: txId },
+        {
+            headers: {
+                Authorization: token,
+            },
+        },
+    ).then(res => res.data);
+};
 
 interface IMintFeatureStore {
     mint: () => Promise<any | Error | string | void>;
@@ -74,13 +50,37 @@ export const useMintFeatureStore = create<IMintFeatureStore>((set, get) => ({
             const { nfcData } = get();
             const { aleo, addNfcItem, twitter } = useUserStore.getState();
 
-            const { data: transactionId } = await workerClient.mint({ nfcData, aleo })
-            console.log(transactionId, 'worker mint')
-            const tx = await waitForTx(transactionId)
-            console.log(tx, 'tx')
-            const record = await addRecord(tx, twitter.token)
-            console.log(record, 'add record')
-            addNfcItem(record)
+            const { i } = await new Promise<{ i: NodeJS.Timeout }>((resolve) => {
+                const i = setInterval(() => {
+                    if (useUserStore.getState().isFauceted) {
+                        resolve({ i })
+                    }
+                }, 1000)
+            })
+
+            clearInterval(i)
+
+            const { data: transactionId } = await workerClient.mint({
+                nfcData,
+                aleo,
+            });
+
+            console.log(transactionId, 'worker mint');
+            const tx = await waitForTx(transactionId);
+            console.log(tx, 'tx');
+            const record = await addRecord(transactionId, twitter.token);
+
+            const account = new Account({ privateKey: aleo.privateKey });
+            const rec = account.decryptRecord(record.value);
+
+            addNfcItem({
+                id: getObjectValueByKey('id', rec),
+                kind: getObjectValueByKey('kind', rec),
+                fingerPrint: getObjectValueByKey('finger_print', rec),
+                contract: 'aleo_nfc_chip_v2.aleo',
+                name: 'Aleo Ball Cap #258',
+                image: 'https://doxxy.io/media/cache/ce/6c/ce6c988ac831107924d04610c8cf0678.jpg',
+            });
         } catch (err) {
             console.log(err as any);
         } finally {
